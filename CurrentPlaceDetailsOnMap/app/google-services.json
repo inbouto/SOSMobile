@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "469860889382",
+    "firebase_url": "https://sosapp-50fee.firebaseio.com",
+    "project_id": "sosapp-50fee",
+    "storage_bucket": "sosapp-50fee.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:469860889382:android:ab5c7afbbadf416e",
+        "android_client_info": {
+          "package_name": "com.SOS_Application.currentplacedetailsonmap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "469860889382-cvijgc0hnk1io6lr9m656b3dsums6hsp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.SOS_Application.currentplacedetailsonmap",
+            "certificate_hash": "ffcf39a32bed08b38c22fbfa1492a341813f266a"
+          }
+        },
+        {
+          "client_id": "469860889382-8u07t91obs2evn9v8am7ubv6qjd8dr8d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-dSH-7yJ1nwrXiFMG5_mKGZqUu1gPUsE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "469860889382-8u07t91obs2evn9v8am7ubv6qjd8dr8d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

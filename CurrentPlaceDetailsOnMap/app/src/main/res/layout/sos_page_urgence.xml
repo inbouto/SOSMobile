@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.SOS_Application.heu1.sosmobile.PageUrgence">
+
+    <TextView
+        android:id="@+id/titreUrgence"
+        android:layout_width="213dp"
+        android:layout_height="29dp"
+        android:layout_marginBottom="44dp"
+        android:layout_marginEnd="85dp"
+        android:layout_marginStart="86dp"
+        android:layout_marginTop="44dp"
+        android:text="Sélectionnez un service"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        app:layout_constraintBottom_toTopOf="@+id/boutonAppel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginRight="85dp"
+        android:layout_marginLeft="86dp" />
+
+    <Button
+        android:id="@+id/boutonAppel"
+        android:layout_width="215dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="58dp"
+        android:layout_marginEnd="84dp"
+        android:layout_marginStart="85dp"
+        android:onClick="onClickAppel"
+        android:text="Appeler les secours"
+        app:layout_constraintBottom_toTopOf="@+id/boutonSignalement"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginRight="84dp"
+        android:layout_marginLeft="85dp" />
+
+    <Button
+        android:id="@+id/boutonSignalement"
+        android:layout_width="215dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="53dp"
+        android:layout_marginEnd="84dp"
+        android:layout_marginStart="85dp"
+        android:onClick="onClickSignal"
+        android:text="Signaler ma position"
+        app:layout_constraintBottom_toTopOf="@+id/boutonDefibrilateur"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginRight="84dp"
+        android:layout_marginLeft="85dp" />
+
+    <Button
+        android:id="@+id/boutonDefibrilateur"
+        android:layout_width="215dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="104dp"
+        android:layout_marginEnd="84dp"
+        android:layout_marginStart="85dp"
+        android:onClick="onClickDefibrilateurs"
+        android:text="Défibrillateurs proches"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginLeft="85dp"
+        android:layout_marginRight="84dp" />
+
+</android.support.constraint.ConstraintLayout>
