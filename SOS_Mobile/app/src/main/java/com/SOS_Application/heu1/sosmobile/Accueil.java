@@ -5,9 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import com.SOS_Application.R;
+import com.SOS_Application.currentplacedetailsonmap.MapsActivityCurrentPlace;
 
 public class Accueil extends AppCompatActivity {
-
+    private final MapsActivityCurrentPlace map = new MapsActivityCurrentPlace();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -15,8 +16,7 @@ public class Accueil extends AppCompatActivity {
     }
 
     public void onClickUrgence(View v) {
-        Intent PageUrgence = new Intent(Accueil.this, PageUrgence.class);
+        Intent PageUrgence = new Intent(this, PageUrgence.class);
         startActivity(PageUrgence);
     }
-
 }

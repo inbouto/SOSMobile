@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CurrentPlaceDetailsOnMap.iml" filepath="$PROJECT_DIR$/CurrentPlaceDetailsOnMap.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SOS_Mobile.iml" filepath="$PROJECT_DIR$/SOS_Mobile.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

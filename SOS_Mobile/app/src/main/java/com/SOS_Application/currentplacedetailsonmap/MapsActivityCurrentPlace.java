@@ -2,6 +2,7 @@ package com.SOS_Application.currentplacedetailsonmap;
 
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,7 +16,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
 import com.SOS_Application.R;
+import com.SOS_Application.gpsTracker.GPSTracker;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.GeoDataClient;
@@ -31,8 +34,26 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.maps.DirectionsApi;
+import com.google.maps.DirectionsApiRequest;
+import com.google.maps.GeoApiContext;
+import com.google.maps.model.DirectionsLeg;
+import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.DirectionsRoute;
+import com.google.maps.model.DirectionsStep;
+import com.google.maps.model.EncodedPolyline;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An activity that displays a map showing the place at the device's current location.
@@ -72,7 +93,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
     private String[] mLikelyPlaceAddresses;
     private String[] mLikelyPlaceAttributions;
     private LatLng[] mLikelyPlaceLatLngs;
-
+    private GPSTracker gps;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +120,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
+        addMarkerLatLng();
     }
 
     /**
@@ -181,6 +202,76 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
+
+
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                gps = new GPSTracker(MapsActivityCurrentPlace.this);
+                double latitude = gps.getLatitude();
+                double longitude = gps.getLongitude();
+                Log.e("message : ", "Your Location is - \nLat: " + latitude + "\nLong: " + longitude);
+                String currPos = (latitude + "," + longitude);
+                String markerPos = (marker.getPosition().latitude + "," + marker.getPosition().longitude);
+                List<LatLng> path = new ArrayList();
+                GeoApiContext context = new GeoApiContext.Builder()
+                        .apiKey("AIzaSyC-nDEG3scnLMdy8sQUfE6RT1UkIZd18pk")
+                        .build();
+                DirectionsApiRequest req = DirectionsApi.getDirections(context, currPos, markerPos);
+                try {
+                    DirectionsResult res = req.await();
+
+                    //Loop through legs and steps to get encoded polylines of each step
+                    if (res.routes != null && res.routes.length > 0) {
+                        DirectionsRoute route = res.routes[0];
+
+                        if (route.legs !=null) {
+                            for(int i=0; i<route.legs.length; i++) {
+                                DirectionsLeg leg = route.legs[i];
+                                if (leg.steps != null) {
+                                    for (int j=0; j<leg.steps.length;j++){
+                                        DirectionsStep step = leg.steps[j];
+                                        if (step.steps != null && step.steps.length >0) {
+                                            for (int k=0; k<step.steps.length;k++){
+                                                DirectionsStep step1 = step.steps[k];
+                                                EncodedPolyline points1 = step1.polyline;
+                                                if (points1 != null) {
+                                                    //Decode polyline and add points to list of route coordinates
+                                                    List<com.google.maps.model.LatLng> coords1 = points1.decodePath();
+                                                    for (com.google.maps.model.LatLng coord1 : coords1) {
+                                                        path.add(new LatLng(coord1.lat, coord1.lng));
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            EncodedPolyline points = step.polyline;
+                                            if (points != null) {
+                                                //Decode polyline and add points to list of route coordinates
+                                                List<com.google.maps.model.LatLng> coords = points.decodePath();
+                                                for (com.google.maps.model.LatLng coord : coords) {
+                                                    path.add(new LatLng(coord.lat, coord.lng));
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch(Exception ex) {
+                    Log.e(TAG, ex.getLocalizedMessage());
+                }
+
+                //Draw the polyline
+                if (path.size() > 0) {
+                    PolylineOptions opts = new PolylineOptions().addAll(path).color(Color.BLUE).width(5);
+                    mMap.addPolyline(opts);
+                }
+
+                mMap.getUiSettings().setZoomControlsEnabled(true);
+
+            }
+        });
     }
 
     /**
@@ -392,5 +483,67 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
         }
+    }
+
+
+    public void addMarkerLatLng() {
+        try {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference("positionDefri");
+            myRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    Log.e("Count ", "" + snapshot.getChildrenCount());
+
+                    for (DataSnapshot postSnapshot : snapshot.getChildren()) {
+                        List<String> listmarker = new ArrayList<>();
+                        for (DataSnapshot postSnapshot2 : postSnapshot.getChildren()) {
+                            String p = postSnapshot2.getValue(String.class);
+                            listmarker.add(p);
+                            Log.e("The read is: ", p);
+                        }
+                        LatLng marker = new LatLng(Double.parseDouble(listmarker.get(1)), Double.parseDouble(listmarker.get(2)));
+                        mMap.addMarker(new MarkerOptions()
+                                .title(listmarker.get(0))
+                                .position(marker)
+                                .snippet("Cliquer ici pour le chemin pour y acceder.")
+                        );
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.e("The read failed: ", databaseError.getMessage());
+                }
+
+            });
+        }catch(NullPointerException e){
+            e.printStackTrace();
+        }
+    }
+
+    public double CalculationByDistance(LatLng StartP, LatLng EndP) {
+        int Radius = 6371;// radius of earth in Km
+        double lat1 = StartP.latitude;
+        double lat2 = EndP.latitude;
+        double lon1 = StartP.longitude;
+        double lon2 = EndP.longitude;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1))
+                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
+                * Math.sin(dLon / 2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+        double valueResult = Radius * c;
+        double km = valueResult / 1;
+        DecimalFormat newFormat = new DecimalFormat("####");
+        int kmInDec = Integer.valueOf(newFormat.format(km));
+        double meter = valueResult % 1000;
+        int meterInDec = Integer.valueOf(newFormat.format(meter));
+        Log.i("Radius Value", "" + valueResult + "   KM  " + kmInDec
+                + " Meter   " + meterInDec);
+
+        return Radius * c;
     }
 }
